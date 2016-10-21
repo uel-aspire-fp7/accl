@@ -1,0 +1,27 @@
+CC=gcc
+
+PLATFORM=serverlinux
+THIRD_PARTY=/opt/3rd_party
+
+# Aspire endpoint parameters
+ACCL_ASPIRE_PORTAL_PROTOCOL=http
+ACCL_ASPIRE_PORTAL_ENDPOINT=127.0.0.1
+ACCL_ASPIRE_PORTAL_PORT=8088
+
+CFLAGS=	-I. \
+	-I$(THIRD_PARTY)/curl/$(PLATFORM)/include/ \
+	-I$(THIRD_PARTY)/libwebsockets/$(PLATFORM)/include/ \
+	-g \
+	-Os \
+	-static \
+	-DACCL_ASPIRE_PORTAL_ENDPOINT=\"$(ACCL_ASPIRE_PORTAL_PROTOCOL)://$(ACCL_ASPIRE_PORTAL_ENDPOINT):$(ACCL_ASPIRE_PORTAL_PORT)/\" \
+	-DACCL_WS_ASPIRE_PORTAL_HOST=\"$(ACCL_ASPIRE_PORTAL_ENDPOINT)\"
+
+all: accl.o
+	ar r accl.a accl.o
+
+%.o: %.c 
+	$(CC) $(CFLAGS) -lz -fpic -c $<
+
+clean:
+	rm *.o *.log -f
