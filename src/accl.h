@@ -246,7 +246,7 @@ void getApplicationId(char** ptr_to_string_to_be_filled);
 #define ACCL_LOG_LEVEL_ERROR	40
 #define ACCL_LOG_LEVEL_NONE		50
 
-#define NDEBUG 1
+//#define NDEBUG 1
 
 /* current logging level */
 #ifndef ACCL_LOG_LEVEL
@@ -299,17 +299,13 @@ typedef struct accl_response {
 	int error;							/* will eventually contain error code */
 } accl_response;
 
-/* application unique id extension */
-//#ifndef ASPIRE_AID
-//	#define ASPIRE_AID "001"
-//#endif
+//#undef NDEBUG
+//#define APPLY_RENEWABILITY
 
 /* internal ACCL procedures */
 #ifndef NDEBUG
 	void acclLOG(const char* tag, const char* fmt, int lvl, ...);
 #endif
-
-#define APPLY_RENEWABILITY
 
 #ifdef APPLY_RENEWABILITY
 	extern bool renewabilityInit();

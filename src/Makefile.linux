@@ -15,6 +15,7 @@ CFLAGS=	-I. \
 	-L$(THIRD_PARTY)/curl/$(PLATFORM)/lib/ \
 	-L$(THIRD_PARTY)/libwebsockets/$(PLATFORM)/lib/ \
 	-L$(THIRD_PARTY)/openssl/$(PLATFORM)/lib/ \
+	-Wall \
 	-g \
 	-Os \
 	-mfloat-abi=softfp -msoft-float -mfpu=neon \

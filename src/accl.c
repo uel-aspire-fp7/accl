@@ -117,6 +117,12 @@ int acclExchange (
 		/* let's inizialize renewability if enabled */
 #ifdef APPLY_RENEWABILITY
 		renewabilityInit();
+
+#ifndef NDEBUG
+		acclLOG("acclExchange",
+			"renewabilityInit()",
+			ACCL_LOG_LEVEL_INFO);
+#endif
 #endif
 	case ACCL_TID_WBS:
 	case ACCL_TID_MTC_CRYPTO_SERVER:
@@ -673,44 +679,21 @@ int callback_accl_communication(
 {
 	int m;
 
-	//pid_t pid_id = syscall(SYS_gettid);
-
-#ifndef NDEBUG
-	//lwsl_notice("ACCL %x: callback_accl_communication() entered\n", pid_id);
-#endif
-
 	struct accl_context_buffer* user_context;
 
 	if (NULL != this) {
-		//lwsl_notice("ACCL %x: callback_accl_communication() entered %x\n", pid_id, this);
-
 		user_context = (struct accl_context_buffer*)libwebsocket_context_user(this);
 	} else {
-#ifndef NDEBUG
-		//lwsl_notice("ACCL %x: callback_accl_communication - CONTEXT CREATION FAILURE (null)\n", pid_id);
-#endif
-	}
 
-#ifndef NDEBUG
-	lwsl_notice("ACCL: callback_accl_communication - context created\n");
-#endif
+	}
 
 	// output buffer has to be pre and post padded
 	// [ ... PRE-PADDING ... | ACTUAL BUFFER CONTENT | ... POST-PADDING ... ]
 	unsigned char write_buffer[LWS_SEND_BUFFER_PRE_PADDING + ACCL_MAX_WS_BUFFER_SIZE + LWS_SEND_BUFFER_POST_PADDING];
 
-#ifndef NDEBUG
-	lwsl_notice("ACCL: callback_accl_communication - write buffer created\n");
-#endif
-
 	// pointer to output buffer actual start offset
 	unsigned char *write_buffer_pointer = &write_buffer[LWS_SEND_BUFFER_PRE_PADDING];
 
-#ifndef NDEBUG
-	lwsl_notice("ACCL: callback_accl_communication - write buffer pointer created\n");
-#endif
-
-	/* TODO use current context's tid */
 	switch (reason) {
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 #ifndef NDEBUG
@@ -818,10 +801,6 @@ int callback_accl_communication(
 			break;
 	}
 
-#ifndef NDEBUG
-	lwsl_notice("ACCL: callback_accl_communication() exit\n");
-#endif
-
 	return 0;
 }
 
@@ -879,6 +858,8 @@ struct libwebsocket_context* acclWebSocketInit (const int T_ID, void* (* callbac
 	struct libwebsocket *wsi_accl;
 	struct accl_context_buffer* user_context;
 	struct libwebsocket_protocols *context_protocols;
+
+	int connect_max_tries = 100;
 
 	char aspire_portal_uri[1024];
 
@@ -960,7 +941,7 @@ struct libwebsocket_context* acclWebSocketInit (const int T_ID, void* (* callbac
 	);
 
 #ifndef NDEBUG
-	lwsl_notice("ACCL - acclWebSocketInit() - client_connected\n");
+	lwsl_notice("ACCL - acclWebSocketInit() - client_connected to host: %s, uri: %s, port: %d\n", host, aspire_portal_uri, port);
 #endif
 
 	if (wsi_accl == NULL) {
@@ -970,8 +951,10 @@ struct libwebsocket_context* acclWebSocketInit (const int T_ID, void* (* callbac
 		return NULL;
 	} else {
 		// wait for channel initialization
-		while (0 == user_context->initialization_complete) {
+		while (0 == user_context->initialization_complete && connect_max_tries > 0) {
 			libwebsocket_service(context, 50);
+
+			connect_max_tries -= 1;
 		}
 
 #ifndef NDEBUG
