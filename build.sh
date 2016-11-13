@@ -19,3 +19,8 @@ if [ -e /opt/3rd_party ]; then
 else
 	echo "Please run FRAMEWORK/select-tool-version.sh -t 3rd_party -v VERSION"
 fi
+
+echo -e "${CGREEN} ACCL build process COMPLETED${CDEFAULT}\n"
+
+TREE_OK=$(which tree)
+[ "${TREE_OK}" != '' ] && tree -h ${SCRIPT_DIR}/prebuilt
