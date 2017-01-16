@@ -679,7 +679,7 @@ int callback_accl_communication(
 {
 	int m;
 
-	struct accl_context_buffer* user_context;
+	struct accl_context_buffer* user_context = 0;
 
 	if (NULL != this) {
 		user_context = (struct accl_context_buffer*)libwebsocket_context_user(this);
@@ -876,6 +876,7 @@ struct libwebsocket_context* acclWebSocketInit (const int T_ID, void* (* callbac
 	user_context->callback = callback;
 	user_context->initialization_complete = 0;
 	user_context->send_in_progress = 0;
+	user_context->wait_for_response = 0;
 
 	if (NULL == user_context->buffer_ptr)
 		return NULL;
