@@ -1,26 +1,15 @@
 #!/bin/bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
 
-SCRIPT_DIR=$(dirname $0)
-cd $SCRIPT_DIR
-SCRIPT_DIR=$(pwd)
+# Get the repo and build directories, go to the build directory
+repo_dir=$(dirname $0)
+build_dir=$1
+mkdir -p $build_dir
+cd $build_dir
 
-if [ -e /opt/3rd_party ]; then
-	for system in linux android serverlinux; do
-	    cd $SCRIPT_DIR
-
-        [ -e prebuilt/$system ] || mkdir -p prebuilt/$system
-
-        cd $SCRIPT_DIR/src
-        make -f Makefile.$system clean && \
-        make -f Makefile.$system && \
-        cp accl.o ../prebuilt/$system && \
-        cp accl.a ../prebuilt/$system
-    done
-else
-	echo "Please run FRAMEWORK/select-tool-version.sh -t 3rd_party -v VERSION"
-fi
-
-echo -e "${CGREEN} ACCL build process COMPLETED${CDEFAULT}\n"
-
-TREE_OK=$(which tree)
-[ "${TREE_OK}" != '' ] && tree -h ${SCRIPT_DIR}/prebuilt
+# Create extra symlinks
+ln -s $repo_dir/src/ $build_dir/include
+ln -s $repo_dir/src/ $build_dir/src
