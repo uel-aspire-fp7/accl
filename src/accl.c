@@ -114,16 +114,6 @@ int acclExchange (
 	switch (T_ID) {
 	case ACCL_TID_CODE_SPLITTING:
 	case ACCL_TID_CODE_MOBILITY:
-		/* let's inizialize renewability if enabled */
-#ifdef APPLY_RENEWABILITY
-		renewabilityInit();
-
-#ifndef NDEBUG
-		acclLOG("acclExchange",
-			"renewabilityInit()",
-			ACCL_LOG_LEVEL_INFO);
-#endif
-#endif
 	case ACCL_TID_WBS:
 	case ACCL_TID_MTC_CRYPTO_SERVER:
 	case ACCL_TID_CG_HASH_RANDOMIZATION:

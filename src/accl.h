@@ -300,15 +300,10 @@ typedef struct accl_response {
 } accl_response;
 
 //#undef NDEBUG
-//#define APPLY_RENEWABILITY
 
 /* internal ACCL procedures */
 #ifndef NDEBUG
 	void acclLOG(const char* tag, const char* fmt, int lvl, ...);
-#endif
-
-#ifdef APPLY_RENEWABILITY
-	extern bool renewabilityInit();
 #endif
 
 size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata);
